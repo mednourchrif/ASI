@@ -1,4 +1,4 @@
-package tn.esprit.autoloc.exception;
+package tn.esprit.autoloc.web.controller;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import tn.esprit.autoloc.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

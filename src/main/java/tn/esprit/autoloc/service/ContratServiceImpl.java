@@ -4,6 +4,7 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Contrat;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
 import tn.esprit.autoloc.repository.IContratRepository;
@@ -20,7 +21,23 @@ public class ContratServiceImpl implements IContratService {
             throw new IllegalArgumentException("Un nouveau contrat ne doit pas avoir d'identifiant");
         }
         validateMontant(contrat.getMontantTotal());
+        if (contrat.getPaiements() != null) {
+            contrat.getPaiements().forEach(paiement -> paiement.setContrat(contrat));
+        }
         return contratRepository.save(contrat);
+    }
+
+    @Override
+    @Transactional
+    public Contrat addWithPayments(Contrat c) {
+        if (c.getId() != null) {
+            throw new IllegalArgumentException("Un nouveau contrat ne doit pas avoir d'identifiant");
+        }
+        validateMontant(c.getMontantTotal());
+        if (c.getPaiements() != null) {
+            c.getPaiements().forEach(paiement -> paiement.setContrat(c));
+        }
+        return contratRepository.save(c);
     }
 
     @Override

@@ -1,0 +1,101 @@
+{
+  "info": {
+    "name": "AutoLoc",
+    "description": "Atelier 5 - tests REST Spring MVC, erreurs et cascade Contrat/Paiement",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "contratId", "value": "1" },
+    { "key": "paiementId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Contrats",
+      "item": [
+        {
+          "name": "Lister les contrats",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/contrats" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 200', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Consulter un contrat inexistant",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/contrats/9999" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 404', function () { pm.response.to.have.status(404); });"] } }]
+        },
+        {
+          "name": "Créer un contrat avec ses paiements",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"dateDebut\": \"2026-11-02\",\n  \"dateFin\": \"2026-11-06\",\n  \"montantTotal\": 480.0,\n  \"statut\": \"EN_COURS\",\n  \"paiements\": [\n    { \"montant\": 150.0, \"datePaiement\": \"2026-11-02\", \"modePaiement\": \"CARTE_BANCAIRE\" },\n    { \"montant\": 330.0, \"datePaiement\": \"2026-11-06\", \"modePaiement\": \"VIREMENT\" }\n  ]\n}" },
+            "url": "{{baseUrl}}/contrats"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 201', function () { pm.response.to.have.status(201); });", "if (pm.response.code === 201) { pm.environment.set('contratId', pm.response.json().id); }"] } }]
+        },
+        {
+          "name": "Créer un contrat avec un identifiant - 400",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": 5,\n  \"montantTotal\": 480.0,\n  \"statut\": \"EN_COURS\"\n}" },
+            "url": "{{baseUrl}}/contrats"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 400', function () { pm.response.to.have.status(400); });"] } }]
+        },
+        {
+          "name": "Modifier le contrat",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"dateDebut\": \"2026-11-02\",\n  \"dateFin\": \"2026-11-06\",\n  \"montantTotal\": 520.0,\n  \"statut\": \"EN_COURS\"\n}" },
+            "url": "{{baseUrl}}/contrats/{{contratId}}"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 200', function () { pm.response.to.have.status(200); });", "pm.test('Montant modifie', function () { pm.expect(pm.response.json().montantTotal).to.eql(520); });"] } }]
+        },
+        {
+          "name": "Modifier un contrat inexistant - 404",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"montantTotal\": 520.0}" }, "url": "{{baseUrl}}/contrats/9999" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 404', function () { pm.response.to.have.status(404); });"] } }]
+        },
+        {
+          "name": "Supprimer le contrat",
+          "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/contrats/{{contratId}}" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 204', function () { pm.response.to.have.status(204); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Paiements",
+      "item": [
+        {
+          "name": "Lister les paiements",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/paiements" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 200', function () { pm.response.to.have.status(200); });"] } }]
+        },
+        {
+          "name": "Consulter un paiement inexistant",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/paiements/9999" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 404', function () { pm.response.to.have.status(404); });"] } }]
+        },
+        {
+          "name": "Créer un paiement - 405",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"montant\": 10}" }, "url": "{{baseUrl}}/paiements" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Statut 405', function () { pm.response.to.have.status(405); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Autres ressources - smoke tests",
+      "item": [
+        { "name": "Lister les agences", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/agences" } },
+        { "name": "Lister les clients", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/clients" } },
+        { "name": "Lister les employés", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/employes" } },
+        { "name": "Lister les véhicules", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/vehicules" } },
+        { "name": "Lister les équipements", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/equipements" } },
+        { "name": "Lister les réservations", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/reservations" } },
+        { "name": "Lister les maintenances", "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/maintenances" } }
+      ]
+    }
+  ]
+}

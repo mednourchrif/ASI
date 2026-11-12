@@ -2,7 +2,7 @@ package tn.esprit.autoloc.domain;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -39,7 +39,7 @@ public class Paiement {
     @Enumerated(EnumType.STRING)
     private ModePaiement modePaiement;
 
-    @JsonIgnore
+    @JsonBackReference("contrat-paiements")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "contrat_id", nullable = false)
     private Contrat contrat;
