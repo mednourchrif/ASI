@@ -61,24 +61,27 @@ class AutolocApiMvcTests {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
+        // Extract created agence id dynamically
+        com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
+        Long agenceId = om.readTree(res).get("id").asLong();
+
         String vehiculePayload = """
             {
-                "immatriculation": "123-TN-456",
+                "immatriculation": "12TU1001",
                 "marque": "Renault",
                 "modele": "Clio",
-                "kilometrage": 50000,
+                "categorie": "BERLINE",
                 "tarifJournalier": 75.0,
-                "disponible": true,
-                "agence": { "id": 1 }
+                "agenceId": %d
             }
-            """;
+            """.formatted(agenceId);
 
         mockMvc.perform(post("/vehicules")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(vehiculePayload))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.immatriculation").value("123-TN-456"));
+                .andExpect(jsonPath("$.immatriculation").value("12TU1001"));
 
         mockMvc.perform(get("/vehicules"))
                 .andExpect(status().isOk())
