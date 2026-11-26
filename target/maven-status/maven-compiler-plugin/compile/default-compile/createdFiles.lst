@@ -40,6 +40,7 @@ tn\esprit\autoloc\service\VehiculeMapper.class
 tn\esprit\autoloc\repository\IClientRepository.class
 tn\esprit\autoloc\domain\Equipement.class
 tn\esprit\autoloc\web\controller\GlobalExceptionHandler.class
+tn\esprit\autoloc\config\DataSeeder.class
 tn\esprit\autoloc\domain\ModePaiement.class
 tn\esprit\autoloc\repository\IContratRepository.class
 tn\esprit\autoloc\web\dto\NbVehiculesAgenceDTO.class
